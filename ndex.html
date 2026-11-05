@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عالم الإبداع | أعمالي ومشاريعي</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --primary:#0f4c81; --accent:#f39c12; --bg:#f7f9fc; --dark:#1a1a2e;
+  --card:#ffffff; --text:#222;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
+body{background:var(--bg);color:var(--text);overflow-x:hidden}
+header{position:sticky;top:0;z-index:100;background:rgba(26,26,46,.95);backdrop-filter:blur(8px)}
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 5%;flex-wrap:wrap}
+.logo{color:#fff;font-size:1.5rem;font-weight:bold}
+.logo span{color:var(--accent)}
+nav ul{display:flex;list-style:none;gap:22px;flex-wrap:wrap}
+nav a{color:#ddd;text-decoration:none;transition:.3s}
+nav a:hover{color:var(--accent)}
+#adminBtn{background:var(--accent);border:none;color:#111;padding:8px 18px;border-radius:20px;cursor:pointer;font-weight:bold}
+.hero{min-height:75vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
+  background:linear-gradient(135deg,#0f4c81cc,#1a1a2ecc),url('https://picsum.photos/1600/900?tech') center/cover;
+  color:#fff;padding:40px 20px}
+.hero h1{font-size:clamp(2rem,5vw,3.5rem);margin-bottom:16px;animation:fadeUp 1s ease}
+.hero p{font-size:1.2rem;max-width:640px;margin-bottom:28px;animation:fadeUp 1.2s ease}
+.cta{background:var(--accent);color:#111;padding:14px 40px;border-radius:30px;text-decoration:none;font-weight:bold;font-size:1.1rem;transition:.3s;animation:fadeUp 1.4s ease}
+.cta:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(243,156,18,.4)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+section{padding:70px 6%}
+.sec-title{text-align:center;font-size:2rem;color:var(--primary);margin-bottom:40px;position:relative}
+.sec-title::after{content:'';display:block;width:70px;height:4px;background:var(--accent);margin:12px auto 0;border-radius:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:26px}
+.card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.08);transition:.35s}
+.card:hover{transform:translateY(-8px);box-shadow:0 14px 30px rgba(15,76,129,.2)}
+.card img{width:100%;height:190px;object-fit:cover}
+.card .body{padding:20px}
+.card h3{color:var(--primary);margin-bottom:8px}
+.card p{color:#555;font-size:.95rem}
+.ad-banner{margin:40px 6%;border-radius:16px;padding:34px;text-align:center;color:#fff;
+  background:linear-gradient(120deg,var(--primary),#2980b9);position:relative;overflow:hidden}
+.ad-banner h2{font-size:1.6rem;margin-bottom:10px}
+.ad-banner img{max-width:100%;border-radius:10px;margin-top:12px}
+#agent-fab{position:fixed;bottom:24px;left:24px;width:60px;height:60px;border-radius:50%;background:var(--accent);
+  border:none;font-size:1.6rem;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:200;transition:.3s}
+#agent-fab:hover{transform:scale(1.1)}
+#agent-box{position:fixed;bottom:100px;left:24px;width:340px;max-width:92vw;background:#fff;border-radius:18px;
+  box-shadow:0 15px 45px rgba(0,0,0,.25);z-index:200;display:none;flex-direction:column;overflow:hidden}
+#agent-box.open{display:flex}
+#agent-head{background:var(--primary);color:#fff;padding:14px;font-weight:bold;display:flex;justify-content:space-between;align-items:center}
+#agent-head button{background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer}
+#agent-msgs{height:280px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#f4f6f9}
+.msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:.92rem;line-height:1.5}
+.msg.bot{background:#e8eef5;align-self:flex-start;border-bottom-left-radius:4px}
+.msg.user{background:var(--primary);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+#agent-input{display:flex;border-top:1px solid #eee}
+#agent-input input{flex:1;border:none;padding:13px;outline:none;font-size:.95rem}
+#agent-input button{background:var(--accent);border:none;padding:0 20px;cursor:pointer;font-size:1.1rem}
+.visitor-form{background:#fff;max-width:560px;margin:0 auto;padding:36px;border-radius:18px;box-shadow:0 8px 25px rgba(0,0,0,.08)}
+.visitor-form input,.visitor-form textarea{width:100%;padding:13px;margin-bottom:14px;border:1.5px solid #ddd;border-radius:10px;font-size:1rem}
+.visitor-form input:focus,.visitor-form textarea:focus{border-color:var(--primary);outline:none}
+.visitor-form button{width:100%;background:var(--primary);color:#fff;border:none;padding:14px;border-radius:10px;font-size:1.05rem;cursor:pointer}
+.visitor-form button:hover{background:#0b3a63}
+footer{background:var(--dark);color:#aaa;text-align:center;padding:30px;margin-top:60px}
+#admin-panel{display:none;position:fixed;inset:0;background:#111827;z-index:300;overflow-y:auto;color:#e5e7eb}
+#admin-panel.open{display:block}
+.admin-top{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#1f2937;position:sticky;top:0}
+.admin-top h2{color:var(--accent)}
+#closeAdmin{background:#ef4444;color:#fff;border:none;padding:8px 18px;border-radius:8px;cursor:pointer}
+.admin-tabs{display:flex;gap:8px;padding:14px 24px;flex-wrap:wrap;background:#1f2937}
+.admin-tabs button{background:#374151;color:#d1d5db;border:none;padding:9px 18px;border-radius:8px;cursor:pointer}
+.admin-tabs button.active{background:var(--accent);color:#111;font-weight:bold}
+.admin-view{padding:24px;display:none}
+.admin-view.active{display:block}
+.admin-view h3{margin-bottom:18px;color:#93c5fd}
+.panel-box{background:#1f2937;border-radius:14px;padding:22px;margin-bottom:20px}
+.panel-box label{display:block;margin:12px 0 6px;color:#d1d5db}
+.panel-box input,.panel-box textarea,.panel-box select{width:100%;padding:10px;border-radius:8px;border:1px solid #4b5563;background:#111827;color:#e5e7eb}
+.panel-box button{background:var(--accent);color:#111;border:none;padding:11px 26px;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:14px}
+table{width:100%;border-collapse:collapse;background:#1f2937;border-radius:12px;overflow:hidden}
+th,td{padding:12px 14px;text-align:right;border-bottom:1px solid #374151;font-size:.92rem}
+th{background:#0f4c81;color:#fff}
+td .del{background:#ef4444;color:#fff;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:.8rem}
+#login-box{max-width:380px;margin:15vh auto;background:#1f2937;padding:36px;border-radius:16px;text-align:center}
+#login-box input{width:100%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #4b5563;background:#111827;color:#fff}
+#login-box button{width:100%;background:var(--accent);border:none;padding:12px;border-radius:8px;font-weight:bold;cursor:pointer}
+.section-item{display:flex;justify-content:space-between;align-items:center;background:#111827;padding:12px 16px;border-radius:10px;margin-bottom:10px;border:1px solid #374151}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-day{background:#111827;padding:10px;text-align:center;border-radius:8px;min-height:70px;font-size:.85rem;border:1px solid #374151;cursor:pointer}
+.cal-day:hover{border-color:var(--accent)}
+.cal-day .appt{background:var(--accent);color:#111;border-radius:6px;padding:2px 4px;margin-top:4px;font-size:.75rem;font-weight:bold}
+#syncStatus{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;padding:8px 16px;border-radius:20px;font-size:.8rem;z-index:250;display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo">عالم <span>الإبداع</span></div>
+    <ul id="mainNav">
+      <li><a href="#works">أعمالي</a></li>
+      <li><a href="#articles">مقالاتي</a></li>
+      <li><a href="#inventions">اختراعاتي</a></li>
+      <li><a href="#projects">مشاريعي</a></li>
+      <li><a href="#visit">سجّل زيارتك</a></li>
+    </ul>
+    <button id="adminBtn">⚙️ لوحة التحكم</button>
+  </nav>
+</header>
+
+<div class="hero" id="hero">
+  <h1 id="heroTitle">أهلاً بك في عالم الإبداع</h1>
+  <p id="heroSub">أعمال مميزة، اختراعات ومشاريع طموحة — تصفّح، اقتبس، وتعاون معي لصناعة الفرق.</p>
+  <a class="cta" href="#works">اكتشف أعمالي</a>
+</div>
+
+<section id="works">
+  <h2 class="sec-title">أعمالي</h2>
+  <div class="grid" id="worksGrid"></div>
+</section>
+
+<div class="ad-banner" id="ad1">
+  <h2>📢 مساحة إعلانية</h2>
+  <p>أضف إعلانك من لوحة التحكم</p>
+</div>
+
+<section id="articles">
+  <h2 class="sec-title">مقالاتي</h2>
+  <div class="grid" id="articlesGrid"></div>
+</section>
+
+<section id="inventions">
+  <h2 class="sec-title">اختراعاتي</h2>
+  <div class="grid" id="invGrid"></div>
+</section>
+
+<div class="ad-banner" id="ad2" style="background:linear-gradient(120deg,#8e44ad,#e67e22)">
+  <h2>📢 مساحة إعلانية ثانية</h2>
+  <p>أضف إعلانك من لوحة التحكم</p>
+</div>
+
+<section id="projects">
+  <h2 class="sec-title">مشاريعي</h2>
+  <div class="grid" id="projGrid"></div>
+</section>
+
+<section id="visit">
+  <h2 class="sec-title">سجل الزوار</h2>
+  <form class="visitor-form" id="visitorForm">
+    <input type="text" id="vName" placeholder="الاسم الكريم" required>
+    <input type="text" id="vCompany" placeholder="اسم الشركة">
+    <input type="tel" id="vPhone" placeholder="رقم الجوال" required>
+    <textarea id="vNotes" rows="3" placeholder="ملاحظات"></textarea>
+    <button type="submit">تسجيل الزيارة</button>
+  </form>
+</section>
+
+<footer>© 2026 عالم الإبداع — جميع الحقوق محفوظة</footer>
+
+<div id="syncStatus">☁️ متصل بقاعدة البيانات</div>
+
+<button id="agent-fab">🤖</button>
+<div id="agent-box">
+  <div id="agent-head"><span>المساعد الذكي</span><button onclick="toggleAgent()">✖</button></div>
+  <div id="agent-msgs">
+    <div class="msg bot">أهلاً بك! أنا مساعدك الذكي. اسألني عن الأعمال، الخدمات، أو اطلب حجز موعد وسأسجّله في الكالندر.</div>
+  </div>
+  <div id="agent-input">
+    <input type="text" id="agentText" placeholder="اكتب سؤالك أو طلب موعد..." onkeydown="if(event.key==='Enter')sendMsg()">
+    <button onclick="sendMsg()">➤</button>
+  </div>
+</div>
+
+<div id="admin-panel">
+  <div id="login-box">
+    <h2 style="color:var(--accent);margin-bottom:16px">🔐 دخول المدير</h2>
+    <input type="password" id="adminPass" placeholder="كلمة المرور (admin123)">
+    <button onclick="adminLogin()">دخول</button>
+  </div>
+  <div id="admin-main" style="display:none">
+    <div class="admin-top">
+      <h2>⚙️ لوحة التحكم</h2>
+      <button id="closeAdmin" onclick="closeAdmin()">✖ إغلاق</button>
+    </div>
+    <div class="admin-tabs">
+      <button class="active" onclick="showView(this,'design')">🎨 التصميم</button>
+      <button onclick="showView(this,'ads')">📢 الإعلانات</button>
+      <button onclick="showView(this,'visitors')">👥 سجل الزوار</button>
+      <button onclick="showView(this,'calendar')">📅 الكالندر</button>
+      <button onclick="showView(this,'sections')">🧩 الأقسام والصفحات</button>
+    </div>
+
+    <div class="admin-view active" id="v-design">
+      <h3>التصميم والخلفيات</h3>
+      <div class="panel-box">
+        <label>عنوان الموقع الرئيسي</label><input type="text" id="setTitle">
+        <label>نص الترحيب</label><input type="text" id="setSub">
+        <label>رابط صورة الخلفية (Hero)</label><input type="text" id="setBg">
+        <label>اللون الرئيسي</label><input type="color" id="setColor" value="#0f4c81">
+        <button onclick="saveDesign()">💾 حفظ التصميم</button>
+      </div>
+    </div>
+
+    <div class="admin-view" id="v-ads">
+      <h3>الإعلانات والبنرات</h3>
+      <div class="panel-box">
+        <label>عنوان الإعلان</label><input type="text" id="adTitle">
+        <label>نص الإعلان</label><input type="text" id="adText">
+        <label>رابط الصورة (اختياري)</label><input type="text" id="adImg">
+        <label>اختر البنر</label>
+        <select id="adSlot"><option value="1">البنر الأول</option><option value="2">البنر الثاني</option></select>
+        <button onclick="saveAd()">💾 حفظ الإعلان</button>
+      </div>
+    </div>
+
+    <div class="admin-view" id="v-visitors">
+      <h3>سجل الزوار <span id="vCount" style="color:var(--accent)"></span></h3>
+      <table id="visitorsTable">
+        <thead><tr><th>الاسم</th><th>الشركة</th><th>الجوال</th><th>ملاحظات</th><th>التاريخ</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="admin-view" id="v-calendar">
+      <h3>الكالندر — المواعيد</h3>
+      <div class="panel-box">
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+          <button onclick="changeMonth(-1)" style="background:#374151">‹ الشهر السابق</button>
+          <h3 id="calTitle" style="margin:0"></h3>
+          <button onclick="changeMonth(1)" style="background:#374151">الشهر التالي ›</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+      <div class="panel-box"><label>المواعيد المسجلة</label><div id="apptItems"></div></div>
+    </div>
+
+    <div class="admin-view" id="v-sections">
+      <h3>الأقسام والصفحات</h3>
+      <div class="panel-box">
+        <label>اسم القسم / الصفحة</label><input type="text" id="secName">
+        <label>نوعه</label>
+        <select id="secType"><option value="works">أعمال</option><option value="articles">مقالات</option><option value="inventions">اختراعات</option><option value="projects">مشاريع</option><option value="page">صفحة جديدة</option></select>
+        <label>الوصف</label><input type="text" id="secDesc">
+        <label>رابط الصورة</label><input type="text" id="secImg">
+        <label>رابط خارجي (للمقالات)</label><input type="text" id="secLink">
+        <button onclick="addSection()">➕ إضافة</button>
+      </div>
+      <div id="secList"></div>
+    </div>
+  </div>
+</div>
+<script>
+/* ================= Supabase ================= */
+const SUPABASE_URL = 'https://vnkpcggyrfqpbtqrtgjg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_SfQkwWPnWmVuSSrNVoSnaA_pZYKo-AD';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let online = false;
+
+const LS = {
+  get(k, d){ try{ return JSON.parse(localStorage.getItem('site_'+k)) ?? d }catch(e){ return d } },
+  set(k, v){ localStorage.setItem('site_'+k, JSON.stringify(v)) }
+};
+
+let visitors = LS.get('visitors', []);
+let appointments = LS.get('appts', []);
+let sections = LS.get('sections', [
+  {id:1,type:'works',name:'موقع تجاري احترافي',description:'تصميم متجر إلكتروني متكامل',image_url:'https://picsum.photos/400/300?web1',link:''},
+  {id:2,type:'works',name:'هوية بصرية كاملة',description:'شعار وألوان وهوية لشركة ناشئة',image_url:'https://picsum.photos/400/300?brand',link:''},
+  {id:3,type:'articles',name:'مستقبل الذكاء الاصطناعي',description:'مقال عن توجهات AI في 2026',image_url:'https://picsum.photos/400/300?ai',link:'#'},
+  {id:4,type:'inventions',name:'جهاز ذكي للري',description:'اختراع يوفّر 40% من المياه',image_url:'https://picsum.photos/400/300?device',link:''},
+  {id:5,type:'projects',name:'تطبيق إدارة المشاريع',description:'تطبيق ويب لتتبع المهام',image_url:'https://picsum.photos/400/300?app',link:''}
+]);
+let design = LS.get('design', {});
+let ads = LS.get('ads', {});
+
+async function loadAll(){
+  try{
+    const [secRes, setRes] = await Promise.all([
+      sb.from('sections').select('*').order('id'),
+      sb.from('settings').select('*')
+    ]);
+    if(secRes.data && secRes.data.length) sections = secRes.data;
+    if(setRes.data){
+      setRes.data.forEach(r=>{
+        if(r.key==='design') design = r.value;
+        if(r.key==='ads') ads = r.value;
+      });
+    }
+    online = true;
+    const st = document.getElementById('syncStatus');
+    st.style.display='block';
+    setTimeout(()=>st.style.display='none', 4000);
+  }catch(e){ online = false; }
+  renderSections(); applyDesign(); renderAds();
+}
+
+/* ================= عرض الأقسام ================= */
+function renderSections(){
+  const map = {works:'worksGrid', articles:'articlesGrid', inventions:'invGrid', projects:'projGrid'};
+  Object.values(map).forEach(id=>document.getElementById(id).innerHTML='');
+  document.querySelectorAll('#mainNav li[id^="page-"]').forEach(e=>e.remove());
+  document.querySelectorAll('.dyn-page').forEach(e=>e.remove());
+  sections.forEach(s=>{
+    if(s.type==='page'){
+      const nav = document.getElementById('mainNav');
+      const li = document.createElement('li');
+      li.id = 'page-'+s.id;
+      li.innerHTML = `<a href="#" onclick="showPage(${s.id});return false">${s.name}</a>`;
+      nav.appendChild(li);
+      const sec = document.createElement('section');
+      sec.className = 'dyn-page'; sec.id = 'pageSec'+s.id; sec.style.display='none';
+      sec.innerHTML = `<h2 class="sec-title">${s.name}</h2><div class="grid">
+        <div class="card"><img src="${s.image_url||'https://picsum.photos/600/300?page'}" style="height:250px"><div class="body"><p>${s.description||''}</p></div></div></div>`;
+      document.querySelector('footer').before(sec);
+      return;
+    }
+    const grid = document.getElementById(map[s.type]);
+    if(!grid) return;
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `<img src="${s.image_url||'https://picsum.photos/400/300'}" alt="${s.name}">
+      <div class="body"><h3>${s.name}</h3><p>${s.description||''}</p>
+      ${s.link?`<a href="${s.link}" target="_blank" style="color:var(--accent);font-weight:bold">اقرأ المزيد ←</a>`:''}</div>`;
+    grid.appendChild(card);
+  });
+}
+function showPage(id){
+  document.querySelectorAll('.dyn-page').forEach(e=>e.style.display='none');
+  const el = document.getElementById('pageSec'+id);
+  if(el){ el.style.display='block'; el.scrollIntoView({behavior:'smooth'}); }
+}
+
+/* ================= التصميم ================= */
+function applyDesign(){
+  if(design.title) document.getElementById('heroTitle').textContent = design.title;
+  if(design.sub) document.getElementById('heroSub').textContent = design.sub;
+  if(design.bg) document.getElementById('hero').style.background = `linear-gradient(135deg,#0f4c81cc,#1a1a2ecc),url('${design.bg}') center/cover`;
+  if(design.color){
+    document.documentElement.style.setProperty('--primary', design.color);
+    document.documentElement.style.setProperty('--accent', design.color);
+  }
+}
+async function saveSetting(key, value){
+  LS.set(key, value);
+  if(online) await sb.from('settings').upsert({key, value});
+}
+async function saveDesign(){
+  design = {title:setTitle.value, sub:setSub.value, bg:setBg.value, color:setColor.value};
+  await saveSetting('design', design); applyDesign(); alert('✅ تم حفظ التصميم');
+}
+
+/* ================= الإعلانات ================= */
+function renderAds(){
+  [1,2].forEach(i=>{
+    const a = ads[i]; if(!a) return;
+    const el = document.getElementById('ad'+i);
+    el.innerHTML = `<h2>📢 ${a.title}</h2><p>${a.text}</p>${a.img?`<img src="${a.img}">`:''}`;
+  });
+}
+async function saveAd(){
+  ads[adSlot.value] = {title:adTitle.value, text:adText.value, img:adImg.value};
+  await saveSetting('ads', ads); renderAds(); alert('✅ تم حفظ الإعلان');
+}
+
+/* ================= الزوار ================= */
+document.getElementById('visitorForm').onsubmit = async e=>{
+  e.preventDefault();
+  const rec = {name:vName.value, company:vCompany.value, phone:vPhone.value, notes:vNotes.value};
+  visitors.push({...rec, created_at:new Date().toISOString()});
+  LS.set('visitors', visitors);
+  if(online){
+    const {error} = await sb.from('visitors').insert(rec);
+    if(error){ alert('⚠️ حُفظ محلياً فقط: '+error.message); }
+  }
+  e.target.reset(); alert('🎉 شكراً لتسجيلك! سأتواصل معك قريباً.');
+  renderVisitors();
+};
+async function renderVisitors(){
+  if(online){
+    const {data} = await sb.from('visitors').select('*').order('created_at',{ascending:false});
+    if(data){ visitors = data; LS.set('visitors', visitors); }
+  }
+  document.getElementById('vCount').textContent = `(${visitors.length} زائر)`;
+  document.querySelector('#visitorsTable tbody').innerHTML = visitors.map(v=>
+    `<tr><td>${v.name}</td><td>${v.company||'—'}</td><td>${v.phone}</td><td>${v.notes||'—'}</td>
+    <td>${v.created_at?new Date(v.created_at).toLocaleDateString('ar'):'—'}</td>
+    <td><button class="del" onclick="delVisitor(${v.id})">حذف</button></td></tr>`).join('') || '<tr><td colspan="6">لا يوجد زوار بعد</td></tr>';
+}
+async function delVisitor(id){
+  visitors = visitors.filter(v=>v.id!==id); LS.set('visitors', visitors);
+  if(online) await sb.from('visitors').delete().eq('id', id);
+  renderVisitors();
+}
+
+/* ================= الكالندر ================= */
+let calDate = new Date();
+async function renderCalendar(){
+  if(online){
+    const {data} = await sb.from('appointments').select('*').order('date');
+    if(data){ appointments = data; LS.set('appts', data); }
+  }
+  const y = calDate.getFullYear(), m = calDate.getMonth();
+  document.getElementById('calTitle').textContent = calDate.toLocaleDateString('ar',{month:'long',year:'numeric'});
+  const first = new Date(y,m,1).getDay();
+  const days = new Date(y,m+1,0).getDate();
+  let html = ['أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'].map(d=>`<div style="text-align:center;font-weight:bold;color:#93c5fd">${d}</div>`).join('');
+  for(let i=0;i<first;i++) html += '<div></div>';
+  for(let d=1;d<=days;d++){
+    const key = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const appts = appointments.filter(a=>a.date===key);
+    html += `<div class="cal-day" onclick="addApptPrompt('${key}')">${d}${appts.map(a=>`<div class="appt">${a.name}</div>`).join('')}</div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+  document.getElementById('apptItems').innerHTML = appointments.map(a=>
+    `<div class="section-item"><span>📅 ${a.date} — ${a.name} (${a.phone||'بدون جوال'})</span><button class="del" onclick="delAppt(${a.id})">حذف</button></div>`).join('') || '<p style="color:#9ca3af">لا مواعيد مسجلة</p>';
+}
+function changeMonth(n){ calDate.setMonth(calDate.getMonth()+n); renderCalendar(); }
+async function addApptPrompt(date){
+  const name = prompt('اسم صاحب الموعد:');
+  if(!name) return;
+  const phone = prompt('رقم الجوال:') || '';
+  await addAppt(date, name, phone);
+}
+async function addAppt(date, name, phone){
+  const rec = {date, name, phone};
+  appointments.push({...rec, id:'tmp'+Date.now()});
+  LS.set('appts', appointments);
+  if(online) await sb.from('appointments').insert(rec);
+  if(document.getElementById('admin-panel').classList.contains('open')) renderCalendar();
+}
+async function delAppt(id){
+  appointments = appointments.filter(a=>a.id!==id); LS.set('appts', appointments);
+  if(online) await sb.from('appointments').delete().eq('id', id);
+  renderCalendar();
+}
+
+/* ================= الوكيل الذكي ================= */
+function toggleAgent(){ document.getElementById('agent-box').classList.toggle('open'); }
+document.getElementById('agent-fab').onclick = toggleAgent;
+function botReply(t){
+  t = t.toLowerCase();
+  const has = (...w)=>w.some(x=>t.includes(x));
+  if(has('موعد','حجز','appointment','احجز')){
+    const d = prompt('📅 ما هو تاريخ الموعد المطلوب؟ (مثال: 2026-11-10)');
+    if(!d) return 'حسناً، أخبرني بالتاريخ وسأسجّله فوراً.';
+    const n = prompt('👤 ما اسمك الكريم؟');
+    if(!n) return 'أحتاج اسمك لتسجيل الموعد.';
+    const p = prompt('📱 رقم الجوال (اختياري):') || '';
+    addAppt(d, n, p);
+    return `✅ تم حجز موعدك يوم ${d} باسم ${n}. ستجده في الكالندر!`;
+  }
+  if(has('سعر','اسعار','أعمال','اعمال','خدمات','تكلفة')) return 'أقدم خدمات تصميم وتطوير بأسعار تنافسية. تصفح قسم "أعمالي" بالأعلى أو احجز موعداً لمناقشة تفاصيل مشروعك.';
+  if(has('اختراع','اختراعات')) return 'لدي عدة اختراعات في مجالات الذكاء الاصطناعي وإنترنت الأشياء. تجدها في قسم "اختراعاتي" مع الصور والتفاصيل.';
+  if(has('مقال','مقالات','مقالاتك')) return 'جميع مقالاتي متاحة في قسم "مقالاتي" — اضغط على أي مقال للقراءة.';
+  if(has('تواصل','اتصال','ايميل','بريد','جوال','هاتف')) return 'يمكنك تسجيل بياناتك في "سجل الزوار" بالأسفل وسأتواصل معك، أو احجز موعداً مباشرة.';
+  if(has('مرحبا','اهلا','السلام','هاي','hello','hi')) return 'أهلاً وسهلاً! كيف أقدر أساعدك اليوم؟ اسألني عن الأعمال أو اطلب حجز موعد.';
+  if(has('شكرا','شكر')) return 'العفو! سعيد بخدمتك. لا تتردد في حجز موعد إذا أردت التعاون.';
+  return 'سؤال جميل! يمكنني مساعدتك في: معرفة الأعمال والأسعار، الاطلاع على الاختراعات والمقالات، أو حجز موعد في الكالندر. ماذا تود؟';
+}
+function sendMsg(){
+  const inp = document.getElementById('agentText');
+  const t = inp.value.trim(); if(!t) return;
+  const box = document.getElementById('agent-msgs');
+  box.innerHTML += `<div class="msg user">${t.replace(/</g,'&lt;')}</div>`;
+  inp.value=''; box.scrollTop = box.scrollHeight;
+  setTimeout(()=>{
+    box.innerHTML += `<div class="msg bot">${botReply(t)}</div>`;
+    box.scrollTop = box.scrollHeight;
+  }, 600);
+}
+
+/* ================= الأقسام (إدارة) ================= */
+function renderSecList(){
+  document.getElementById('secList').innerHTML = sections.map(s=>
+    `<div class="section-item"><span><b>${s.name}</b> — ${({works:'أعمال',articles:'مقالات',inventions:'اختراعات',projects:'مشاريع',page:'صفحة'})[s.type]}</span>
+     <button class="del" onclick="delSection(${s.id})">حذف</button></div>`).join('');
+}
+async function addSection(){
+  const rec = {type:secType.value, name:secName.value, description:secDesc.value, image_url:secImg.value, link:secLink.value};
+  if(online){
+    const {data, error} = await sb.from('sections').insert(rec).select();
+    if(error){ alert('⚠️ '+error.message); return; }
+    if(data) rec.id = data[0].id;
+  } else { rec.id = Date.now(); }
+  sections.push(rec); LS.set('sections', sections);
+  renderSections(); renderSecList();
+  secName.value=secDesc.value=secImg.value=secLink.value='';
+  alert('✅ تمت الإضافة');
+}
+async function delSection(id){
+  sections = sections.filter(s=>s.id!==id);
+  LS.set('sections', sections);
+  if(online) await sb.from('sections').delete().eq('id', id);
+  renderSections(); renderSecList();
+}
+
+/* ================= لوحة التحكم ================= */
+document.getElementById('adminBtn').onclick = ()=>{
+  document.getElementById('admin-panel').classList.add('open');
+  if(sessionStorage.getItem('admin')==='1'){
+    document.getElementById('login-box').style.display='none';
+    document.getElementById('admin-main').style.display='block';
+  }
+};
+function adminLogin(){
+  if(document.getElementById('adminPass').value==='admin123'){
+    sessionStorage.setItem('admin','1');
+    document.getElementById('login-box').style.display='none';
+    document.getElementById('admin-main').style.display='block';
+    renderVisitors(); renderCalendar(); renderSecList();
+  } else alert('❌ كلمة مرور خاطئة');
+}
+function closeAdmin(){ document.getElementById('admin-panel').classList.remove('open'); }
+function showView(btn, id){
+  document.querySelectorAll('.admin-tabs button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.admin-view').forEach(v=>v.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('v-'+id).classList.add('active');
+  if(id==='visitors') renderVisitors();
+  if(id==='calendar') renderCalendar();
+  if(id==='sections') renderSecList();
+}
+
+/* ================= تشغيل ================= */
+renderSections(); applyDesign(); renderAds(); renderVisitors(); renderCalendar(); renderSecList();
+loadAll();
+</script>
+</body>
+</html>
